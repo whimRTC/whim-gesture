@@ -4,7 +4,7 @@
       class="player"
       :width="videoWidth" 
       :height="videoHeight" 
-      v-if="$route.query.isMe == 'True'"
+      v-if="$route.query.isMe === 'True'"
     >
       <div v-if="theme !== ''" >
         <v-card>{{theme}}</v-card>
@@ -29,7 +29,7 @@ export default {
       appData: [],
       users: [],
       theme: '',
-      words: [],
+      indices: [],
       vocabulary: ['ウサギ', 'キツネ', '野球', 'サッカー', 'バスケットボール', '料理', '先生', 'ふりかけ', '恐竜', 'テニス', 'ラグビー', '柔道', '剣道', '空手', '水泳', 'スケート', '棒高跳び', '砲丸投げ', '編み物', '茶道', '乳搾り', 'パソコン', 'テレビゲーム', '掃除', '漫才', '宇宙飛行士', '運転', '飛行機', 'オートバイ']
     }
   },
@@ -61,24 +61,28 @@ export default {
   },
   methods: {
     newTheme() {
-      if(this.words.length === 0) {
-        this.words = this.vocabulary
+      if(this.indices.length === 0) {
+        this.indices = Array.from({length: this.vocabulary.length}, (v, k) => k)
       }
-      const arrayIdx = Math.floor(Math.random() * this.words.length)
-      const theme = this.words[arrayIdx]
-      this.words.splice(arrayIdx, 1) // 既出単語を削除
-      return theme
+      const arrayIdx = Math.floor(Math.random() * this.indices.length)
+      this.theme = this.vocabulary[this.indices[arrayIdx]]
+      this.indices.splice(arrayIdx, 1) // 既出単語を削除
     }
   },
-  mounted() {
+  async mounted() {
     console.log('hoge')
-  },
-  firestore() {
-    return {
-      room: db.collection('rooms').doc(this.$route.query.roomId),
-      appData: this.fireRoom.collection('appData'),
-      users: this.fireRoom.collection('users')
-    }
+
+    const data = await firebase.auth().signInAnonymously()
+    console.log(data)
+    console.log(data.user.uid)
+
+    this.uid = data.user.uid
+
+    await this.fireRoom.collection('appClients').doc(this.uid).set({});
+
+    this.$bind('room', this.fireRoom)
+    this.$bind('appData', this.fireRoom.collection('appData'))
+    this.$bind('users', this.fireRoom.collection('users'))
   }
 }
 </script>
