@@ -1,1 +1,1 @@
-# ica-gesture
+# whim-gesture
