@@ -20,6 +20,7 @@
 <script>
 
 import firebase from "~/plugins/firebase.js"
+import func from '../../vue-temp/vue-editor-bridge';
 const db = firebase.firestore();
 
 export default {
@@ -61,9 +62,23 @@ export default {
       this.indices.splice(arrayIdx, 1) // 既出単語を削除
     },
     initialize() {
-      this.fireRoom.collection('appState').doc('gesture').set({questioner: this.playerId})
+      this.fireRoom.collection('appState').doc('gesture').set({
+        questioner: this.playerId,
+        time: 60
+      })
       this.newTheme()
-    }
+      function timeKeeper() {
+        const state = this.fireRoom.collection('appState').doc('gesture').get()
+        const time = state.data().time
+        if(time === 0) {
+          this.finish()
+        }
+        this.fireRoom.collection('appState').doc('gesture').set({time: time-1})
+        setTimeout(timeKeeper, 1000)
+      }
+      setTimeout(timeKeeper, 1000)
+    },
+    finish() {}
   },
   async mounted() {
     console.log('hoge')
