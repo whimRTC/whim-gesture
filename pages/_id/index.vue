@@ -1,16 +1,17 @@
 <template>
   <div class="container" style="background-color:transparent;">
+    
     <div
       class="player"
       :width="videoWidth" 
       :height="videoHeight" 
-      v-if="$route.query.isMe === 'True'"
+      v-if="$route.query.isMe === 'True' && playerId === questioner"
     >
       <div v-if="theme !== ''" >
         <v-card>{{theme}}</v-card>
-        <v-btn color="primary" @click="newTheme"> 次のお題へ </v-btn>
+        <v-btn color="primary" @click="newTheme">次のお題へ</v-btn>
       </div>
-      <v-btn v-else @click="newTheme">Game Start</v-btn>
+      <v-btn v-else @click="initialize">出題者になる</v-btn>
     </div>
   </div>
 </template>
@@ -46,18 +47,9 @@ export default {
     playerId() {
       return this.$route.params.id
     },
-    isSelected() {
-      return this.appData.find(element => element.id == this.playerId);
+    questioner() {
+      return this.appState.find(element => element.questioner)
     },
-    isAllSelected() {
-      return this.users.length <= this.appData.length
-    },
-    selectedShow() {
-      if(!this.isSelected){
-        return false
-      }
-      return this.isSelected.show
-    }
   },
   methods: {
     newTheme() {
@@ -67,6 +59,10 @@ export default {
       const arrayIdx = Math.floor(Math.random() * this.indices.length)
       this.theme = this.vocabulary[this.indices[arrayIdx]]
       this.indices.splice(arrayIdx, 1) // 既出単語を削除
+    },
+    initialize() {
+      this.fireRoom.collection('appState').doc('gesture').set({questioner: this.playerId})
+      this.newTheme()
     }
   },
   async mounted() {
@@ -82,6 +78,7 @@ export default {
 
     this.$bind('room', this.fireRoom)
     this.$bind('appData', this.fireRoom.collection('appData'))
+    this.$bind('appState', this.fireRoom.collection('appState'))
     this.$bind('users', this.fireRoom.collection('users'))
   }
 }
