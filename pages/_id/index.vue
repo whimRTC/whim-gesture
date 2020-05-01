@@ -72,6 +72,7 @@ export default {
         const time = state.data().time
         if(time === 0) {
           this.finish()
+          return
         }
         this.fireRoom.collection('appState').doc('gesture').set({time: time-1})
         setTimeout(timeKeeper, 1000)
