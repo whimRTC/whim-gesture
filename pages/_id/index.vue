@@ -28,7 +28,7 @@ export default {
     return {
       width: window.innerWidth,
       height: window.innerHeight,
-      appData: [],
+      appUserState: [],
       users: [],
       theme: '',
       indices: [],
@@ -93,7 +93,7 @@ export default {
     await this.fireRoom.collection('appClients').doc(this.uid).set({});
 
     this.$bind('room', this.fireRoom)
-    this.$bind('appData', this.fireRoom.collection('appData'))
+    this.$bind('appUserState', this.fireRoom.collection('appUserState'))
     this.$bind('appState', this.fireRoom.collection('appState'))
     this.$bind('users', this.fireRoom.collection('users'))
   }
