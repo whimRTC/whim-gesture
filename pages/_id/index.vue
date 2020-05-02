@@ -62,19 +62,19 @@ export default {
       this.indices.splice(arrayIdx, 1) // 既出単語を削除
     },
     initialize() {
-      this.fireRoom.collection('appState').doc('gesture').set({
+      this.fireRoom.update({appState: {
         questioner: this.playerId,
         time: 60
-      })
+      }})
       this.newTheme()
       function timeKeeper() {
-        const state = this.fireRoom.collection('appState').doc('gesture').get()
-        const time = state.data().time
+        const state = this.fireRoom.get()
+        const time = state.data().appState.time
         if(time === 0) {
           this.finish()
           return
         }
-        this.fireRoom.collection('appState').doc('gesture').update({time: time-1})
+        this.fireRoom.update({appState: {time: time-1}})
         setTimeout(timeKeeper, 1000)
       }
       setTimeout(timeKeeper, 1000)
@@ -94,7 +94,7 @@ export default {
 
     this.$bind('room', this.fireRoom)
     this.$bind('appUserState', this.fireRoom.collection('appUserState'))
-    this.$bind('appState', this.fireRoom.collection('appState'))
+    // this.$bind('appState', this.fireRoom.collection('appState'))
     this.$bind('users', this.fireRoom.collection('users'))
   }
 }
