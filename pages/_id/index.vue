@@ -55,7 +55,7 @@ export default {
       return db.collection('rooms').doc(this.roomId)
     },
     appState: function(){
-      return room.appState;
+      return this.room.appState;
     },
     questioner() {
       // return this.appState.find(element => element.questioner)
