@@ -1,11 +1,17 @@
 <template>
   <div class="container" style="background-color:transparent;">
-    {{room.appState.questioner}}
+    <div v-if="playerId===0">
+      <v-card>
+        <v-card-title>
+          あと{{room.appState.time}}秒！
+        </v-card-title>
+      </v-card>
+    </div>
     <div
       class="player"
       :width="videoWidth" 
       :height="videoHeight" 
-      v-if="$route.query.isMe === 'True' && playerId === room.appState.questioner"
+      v-else-if="$route.query.isMe === 'True' && playerId === room.appState.questioner"
     >
       <div>
         <v-card>{{theme}}</v-card>
