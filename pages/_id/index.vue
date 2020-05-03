@@ -78,10 +78,10 @@ export default {
         time: 60
       }})
       this.newTheme()
-      const timeKeeper = () => {
-        const state = this.fireRoom.get()
-        console.log(state.data())
+      const timeKeeper = async () => {
+        const state = await this.fireRoom.get()
         const time = state.data().appState.time
+        console.log(time)
         if(time === 0) {
           this.finish()
           return
