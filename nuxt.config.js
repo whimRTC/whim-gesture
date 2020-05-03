@@ -102,5 +102,9 @@ export default {
       '/3',
       '/4'
     ]
+  },
+  env: {
+    appEnv: process.env.NUXT_ENV_APP_ENV,
+    whimEnv: process.env.NUXT_ENV_WHIM_ENV
   }
 }
