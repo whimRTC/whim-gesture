@@ -31,6 +31,9 @@ export default {
       appUserState: [],
       users: [],
       theme: '',
+      room: {
+        appState: {}
+      },
       indices: [],
       vocabulary: ['ウサギ', 'キツネ', '野球', 'サッカー', 'バスケットボール', '料理', '先生', 'ふりかけ', '恐竜', 'テニス', 'ラグビー', '柔道', '剣道', '空手', '水泳', 'スケート', '棒高跳び', '砲丸投げ', '編み物', '茶道', '乳搾り', 'パソコン', 'テレビゲーム', '掃除', '漫才', '宇宙飛行士', '運転', '飛行機', 'オートバイ']
     }
@@ -42,14 +45,22 @@ export default {
     videoHeight: function(){
       return Math.floor(this.height/2)
     },
-    fireRoom: function(){
-      return db.collection('rooms').doc(this.$route.query.roomId)
+    roomId() {
+      return this.$route.query.roomId
     },
     playerId() {
       return this.$route.params.id
     },
+    fireRoom: function(){
+      return db.collection('rooms').doc(this.roomId)
+    },
+    appState: function(){
+      return room.appState;
+    },
     questioner() {
-      return this.appState.find(element => element.questioner)
+      // return this.appState.find(element => element.questioner)
+      // this.appStateはobjectだから動かない
+      return '' 
     },
   },
   methods: {
@@ -82,11 +93,9 @@ export default {
     finish() {}
   },
   async mounted() {
-    console.log('hoge')
+    console.log('roomId:' + this.roomId)
 
     const data = await firebase.auth().signInAnonymously()
-    console.log(data)
-    console.log(data.user.uid)
 
     this.uid = data.user.uid
 
@@ -94,7 +103,6 @@ export default {
 
     this.$bind('room', this.fireRoom)
     this.$bind('appUserState', this.fireRoom.collection('appUserState'))
-    // this.$bind('appState', this.fireRoom.collection('appState'))
     this.$bind('users', this.fireRoom.collection('users'))
   }
 }
