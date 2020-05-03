@@ -1,18 +1,18 @@
 <template>
   <div class="container" style="background-color:transparent;">
-    {{questioner}}
+    {{room.appState.questioner}}
     <div
       class="player"
       :width="videoWidth" 
       :height="videoHeight" 
-      v-if="$route.query.isMe === 'True' && playerId === questioner"
+      v-if="$route.query.isMe === 'True' && playerId === room.appState.questioner"
     >
-      <div v-if="theme !== ''" >
+      <div>
         <v-card>{{theme}}</v-card>
         <v-btn color="primary" @click="newTheme">次のお題へ</v-btn>
       </div>
     </div>
-    <v-btn v-else-if="questioner === undefined" @click="initialize">出題者になる</v-btn>
+    <v-btn v-else-if="!room.appState.questioner" @click="initialize">出題者になる</v-btn>
   </div>
 </template>
 
@@ -34,6 +34,7 @@ export default {
       room: {
         appState: {}
       },
+      appState: {},
       indices: [],
       vocabulary: ['ウサギ', 'キツネ', '野球', 'サッカー', 'バスケットボール', '料理', '先生', 'ふりかけ', '恐竜', 'テニス', 'ラグビー', '柔道', '剣道', '空手', '水泳', 'スケート', '棒高跳び', '砲丸投げ', '編み物', '茶道', '乳搾り', 'パソコン', 'テレビゲーム', '掃除', '漫才', '宇宙飛行士', '運転', '飛行機', 'オートバイ']
     }
@@ -54,14 +55,6 @@ export default {
     fireRoom: function(){
       return db.collection('rooms').doc(this.roomId)
     },
-    questioner: function(){
-      console.log(this.room.appState.questioner)
-      return this.room.appState.questioner
-    },
-    time: function(){
-      console.log(this.room.appState.time)
-      return this.room.appState.time
-    },
   },
   methods: {
     newTheme() {
@@ -78,17 +71,18 @@ export default {
         time: 60
       }})
       this.newTheme()
-      const timeKeeper = async () => {
+      // return /***** この上の設定がthis.appStateに反映されない */
+      const timeKeeper = () => {
         // const state = await this.fireRoom.get()
         // const time = state.data().appState.time
-        // console.log(time)
-        const time = this.time
+        const time = this.room.appState.time
+        console.log(time)
         if(time === 0) {
           this.finish()
           return
         }
         this.fireRoom.update({appState: {
-          questioner: this.questioner,
+          questioner: this.room.appState.questioner,
           time: time-1
         }})
         setTimeout(timeKeeper, 1000)
@@ -105,7 +99,10 @@ export default {
     this.uid = data.user.uid
 
     await this.fireRoom.collection('appClients').doc(this.uid).set({});
-
+    await this.fireRoom.update({appState: {
+      questioner: null,
+      time: 60
+    }})
     this.$bind('room', this.fireRoom)
     this.$bind('appUserState', this.fireRoom.collection('appUserState'))
     this.$bind('users', this.fireRoom.collection('users'))
