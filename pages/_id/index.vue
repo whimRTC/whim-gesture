@@ -3,6 +3,7 @@
     <div v-if="playerId===0">
       <v-card>
         <v-card-title>
+          正解数: {{room.appState.nAnswer}}
           あと{{room.appState.time}}秒！
         </v-card-title>
       </v-card>
@@ -14,8 +15,17 @@
       v-else-if="$route.query.isMe === 'True' && playerId === room.appState.questioner"
     >
       <div>
-        <v-card>{{theme}}</v-card>
-        <v-btn color="primary" @click="newTheme">次のお題へ</v-btn>
+        <v-card>
+          <v-card-title>
+            {{theme}}
+          </v-card-title>
+          <v-card-subtitle>
+            正解数: {{room.appState.nAnswer}}
+            あと{{room.appState.time}}秒！
+          </v-card-subtitle>
+          <v-btn color="danger" @click="newTheme">パス</v-btn>
+          <v-btn color="success" @click="correct">OK</v-btn>
+        </v-card>
       </div>
     </div>
     <v-btn v-else-if="!room.appState.questioner" @click="initialize">出題者になる</v-btn>
@@ -74,6 +84,7 @@ export default {
     initialize() {
       this.fireRoom.update({appState: {
         questioner: this.playerId,
+        nAnswer: 0,
         time: 60
       }})
       this.newTheme()
@@ -89,11 +100,20 @@ export default {
         }
         this.fireRoom.update({appState: {
           questioner: this.room.appState.questioner,
+          nAnswer: this.room.appState.nAnswer,
           time: time-1
         }})
         setTimeout(timeKeeper, 1000)
       }
       setTimeout(timeKeeper, 1000)
+    },
+    correct() {
+      this.fireRoom.update({appState: {
+          questioner: this.room.appState.questioner,
+          nAnswer: this.room.appState.nAnswer + 1,
+          time: this.room.appState.time
+      }})
+      this.newTheme()
     },
     finish() {}
   },
@@ -107,6 +127,7 @@ export default {
     await this.fireRoom.collection('appClients').doc(this.uid).set({});
     await this.fireRoom.update({appState: {
       questioner: null,
+      nAnswer: 0,
       time: 60
     }})
     this.$bind('room', this.fireRoom)
