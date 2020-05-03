@@ -1,6 +1,6 @@
 <template>
   <div class="container" style="background-color:transparent;">
-    
+    {{questioner}}
     <div
       class="player"
       :width="videoWidth" 
@@ -12,7 +12,7 @@
         <v-btn color="primary" @click="newTheme">次のお題へ</v-btn>
       </div>
     </div>
-    <v-btn v-else-if="questioner === ''" @click="initialize">出題者になる</v-btn>
+    <v-btn v-else-if="questioner === undefined" @click="initialize">出題者になる</v-btn>
   </div>
 </template>
 
@@ -54,13 +54,13 @@ export default {
     fireRoom: function(){
       return db.collection('rooms').doc(this.roomId)
     },
-    appState: function(){
-      return this.room.appState;
+    questioner: function(){
+      console.log(this.room.appState.questioner)
+      return this.room.appState.questioner
     },
-    questioner() {
-      // return this.appState.find(element => element.questioner)
-      // this.appStateはobjectだから動かない
-      return '' 
+    time: function(){
+      console.log(this.room.appState.time)
+      return this.room.appState.time
     },
   },
   methods: {
@@ -79,14 +79,18 @@ export default {
       }})
       this.newTheme()
       const timeKeeper = async () => {
-        const state = await this.fireRoom.get()
-        const time = state.data().appState.time
-        console.log(time)
+        // const state = await this.fireRoom.get()
+        // const time = state.data().appState.time
+        // console.log(time)
+        const time = this.time
         if(time === 0) {
           this.finish()
           return
         }
-        this.fireRoom.update({appState: {time: time-1}})
+        this.fireRoom.update({appState: {
+          questioner: this.questioner,
+          time: time-1
+        }})
         setTimeout(timeKeeper, 1000)
       }
       setTimeout(timeKeeper, 1000)
