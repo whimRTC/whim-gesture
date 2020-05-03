@@ -28,7 +28,7 @@
         </v-card>
       </div>
     </div>
-    <v-btn v-else-if="!room.appState.questioner" @click="initialize">出題者になる</v-btn>
+    <v-btn v-else-if="$route.query.isMe === 'True' && !room.appState.questioner" @click="initialize">出題者になる</v-btn>
   </div>
 </template>
 
