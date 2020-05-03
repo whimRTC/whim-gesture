@@ -11,8 +11,8 @@
         <v-card>{{theme}}</v-card>
         <v-btn color="primary" @click="newTheme">次のお題へ</v-btn>
       </div>
-      <v-btn v-else @click="initialize">出題者になる</v-btn>
     </div>
+    <v-btn v-else-if="questioner === ''" @click="initialize">出題者になる</v-btn>
   </div>
 </template>
 
@@ -78,8 +78,9 @@ export default {
         time: 60
       }})
       this.newTheme()
-      function timeKeeper() {
+      const timeKeeper = () => {
         const state = this.fireRoom.get()
+        console.log(state.data())
         const time = state.data().appState.time
         if(time === 0) {
           this.finish()
