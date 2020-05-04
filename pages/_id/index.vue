@@ -36,6 +36,10 @@
       <v-card-text>結果: {{room.appState.nAnswer}}ポイント</v-card-text>
       <v-btn @click="initialize">もう一度やる！</v-btn>
     </v-card>
+    <div v-else-if="playerId === room.appState.questioner && room.appState.time!==0">
+      <v-btn class="mb-12">ジェスチャー中</v-btn>
+      <span/>
+    </div>
   </div>
 </template>
 
