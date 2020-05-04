@@ -12,7 +12,7 @@
       class="player"
       :width="videoWidth" 
       :height="videoHeight" 
-      v-else-if="$route.query.isMe === 'True' && playerId === room.appState.questioner"
+      v-else-if="$route.query.isMe === 'True' && playerId === room.appState.questioner && room.appState.time!==0"
     >
       <div>
         <v-card>
@@ -28,7 +28,11 @@
         </v-card>
       </div>
     </div>
-    <v-btn v-else-if="$route.query.isMe === 'True' && !room.appState.questioner" @click="initialize">出題者になる</v-btn>
+    <v-btn v-else-if="$route.query.isMe === 'True' && !room.appState.questioner" @click="start">出題者になる</v-btn>
+    <v-card v-else-if="$route.query.isMe === 'True' && room.appState.time===0" @click="initialize">
+      <v-card-text>結果: {{room.appState.nAnswer}}ポイント</v-card-text>
+      <v-btn @click="initialize">もう一度やる！</v-btn>
+    </v-card>
   </div>
 </template>
 
@@ -83,6 +87,13 @@ export default {
       this.indices.splice(arrayIdx, 1) // 既出単語を削除
     },
     initialize() {
+      this.fireRoom.update({appState: {
+        questioner: null,
+        nAnswer: 0,
+        time: 60
+      }})
+    },
+    start() {
       this.fireRoom.update({appState: {
         questioner: this.playerId,
         nAnswer: 0,
