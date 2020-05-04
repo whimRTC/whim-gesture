@@ -1,5 +1,4 @@
 import colors from 'vuetify/es5/util/colors'
-const routerBase = process.env.DEPLOY_ENV === 'production' ? '/ica-gesture/' : '/'
 
 export default {
   mode: 'spa',
@@ -93,7 +92,18 @@ export default {
     host: '0.0.0.0' // デフォルト: localhost
   },
   router: {
-    base: routerBase
+    base: (function() {
+      if(process.env.NUXT_ENV_APP_ENV === 'development'){
+        return '/'
+      }
+      if(process.env.NUXT_ENV_WHIM_ENV === 'development'){
+        return '/whim-gesture/dev/'
+      }else if(process.env.NUXT_ENV_WHIM_ENV === 'staging'){
+        return '/whim-gesture/stg/'
+      }else{
+        return '/whim-gesture/'
+      }
+    }())
   },
   generate: {
     routes: [
