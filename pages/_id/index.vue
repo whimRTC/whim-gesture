@@ -1,6 +1,9 @@
 <template>
   <div class="container" style="background-color:transparent;">
-    <div v-if="playerId===0">
+    <v-btn v-if="loading">
+      Now Loading
+    </v-btn>
+    <div v-else-if="playerId===0">
       <v-card>
         <v-card-title>
           正解数: {{room.appState.nAnswer}}
@@ -52,6 +55,7 @@ export default {
       appUserState: [],
       users: [],
       theme: '',
+      loading: true,
       room: {
         appState: {}
       },
@@ -145,6 +149,7 @@ export default {
     this.$bind('room', this.fireRoom)
     this.$bind('appUserState', this.fireRoom.collection('appUserState'))
     this.$bind('users', this.fireRoom.collection('users'))
+    this.loading = false
   }
 }
 </script>
