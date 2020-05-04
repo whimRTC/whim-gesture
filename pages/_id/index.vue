@@ -40,6 +40,7 @@ import firebase from "~/plugins/firebase.js"
 const db = firebase.firestore();
 
 export default {
+  name: 'rooms-id',
   data: function () {
     return {
       width: window.innerWidth,
