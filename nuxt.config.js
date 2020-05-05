@@ -107,10 +107,10 @@ export default {
   },
   generate: {
     routes: [
-      '/1',
-      '/2',
-      '/3',
-      '/4'
+      'player/1',
+      'player/2',
+      'player/3',
+      'player/4'
     ]
   },
   env: {
