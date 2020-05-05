@@ -1,6 +1,9 @@
 <template>
   <div class="container" style="background-color:transparent;">
-    <div v-if="playerId===0">
+    <v-btn v-if="loading">
+      Now Loading
+    </v-btn>
+    <div v-else-if="playerId===0">
       <v-card>
         <v-card-title>
           正解数: {{room.appState.nAnswer}}
@@ -12,7 +15,7 @@
       class="player"
       :width="videoWidth" 
       :height="videoHeight" 
-      v-else-if="$route.query.isMe === 'True' && playerId === room.appState.questioner"
+      v-else-if="$route.query.isMe === 'True' && playerId === room.appState.questioner && room.appState.time!==0"
     >
       <div>
         <v-card>
@@ -28,7 +31,15 @@
         </v-card>
       </div>
     </div>
-    <v-btn v-else-if="$route.query.isMe === 'True' && !room.appState.questioner" @click="initialize">出題者になる</v-btn>
+    <v-btn v-else-if="$route.query.isMe === 'True' && !room.appState.questioner" @click="start">出題者になる</v-btn>
+    <v-card v-else-if="$route.query.isMe === 'True' && room.appState.time===0" @click="initialize">
+      <v-card-text>結果: {{room.appState.nAnswer}}ポイント</v-card-text>
+      <v-btn @click="initialize">もう一度やる！</v-btn>
+    </v-card>
+    <div v-else-if="playerId === room.appState.questioner && room.appState.time!==0">
+      <v-btn class="mb-12">ジェスチャー中</v-btn>
+      <span/>
+    </div>
   </div>
 </template>
 
@@ -40,6 +51,7 @@ import firebase from "~/plugins/firebase.js"
 const db = firebase.firestore();
 
 export default {
+  name: 'rooms-id',
   data: function () {
     return {
       width: window.innerWidth,
@@ -47,6 +59,7 @@ export default {
       appUserState: [],
       users: [],
       theme: '',
+      loading: true,
       room: {
         appState: {}
       },
@@ -82,6 +95,13 @@ export default {
       this.indices.splice(arrayIdx, 1) // 既出単語を削除
     },
     initialize() {
+      this.fireRoom.update({appState: {
+        questioner: null,
+        nAnswer: 0,
+        time: 60
+      }})
+    },
+    start() {
       this.fireRoom.update({appState: {
         questioner: this.playerId,
         nAnswer: 0,
@@ -133,6 +153,7 @@ export default {
     this.$bind('room', this.fireRoom)
     this.$bind('appUserState', this.fireRoom.collection('appUserState'))
     this.$bind('users', this.fireRoom.collection('users'))
+    this.loading = false
   }
 }
 </script>
