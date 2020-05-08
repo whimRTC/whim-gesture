@@ -3,19 +3,11 @@
     <v-btn v-if="loading">
       Now Loading
     </v-btn>
-    <div v-else-if="playerId===0">
-      <v-card>
-        <v-card-title>
-          正解数: {{room.appState.nAnswer}}
-          あと{{room.appState.time}}秒！
-        </v-card-title>
-      </v-card>
-    </div>
     <div
       class="player"
       :width="videoWidth" 
       :height="videoHeight" 
-      v-else-if="$route.query.isMe === 'True' && playerId === room.appState.questioner && room.appState.time!==0"
+      v-else-if="isMe && userId === room.appState.questioner && room.appState.time!==0"
     >
       <div>
         <v-card>
@@ -32,11 +24,11 @@
       </div>
     </div>
     <v-btn v-else-if="$route.query.isMe === 'True' && !room.appState.questioner" @click="start">出題者になる</v-btn>
-    <v-card v-else-if="$route.query.isMe === 'True' && room.appState.time===0" @click="initialize">
+    <v-card v-else-if="isMe && room.appState.time===0" @click="initialize">
       <v-card-text>結果: {{room.appState.nAnswer}}ポイント</v-card-text>
       <v-btn @click="initialize">もう一度やる！</v-btn>
     </v-card>
-    <div v-else-if="playerId === room.appState.questioner && room.appState.time!==0">
+    <div v-else-if="userId === room.appState.questioner && room.appState.time!==0">
       <v-btn class="mb-12">ジェスチャー中</v-btn>
       <span/>
     </div>
@@ -75,14 +67,14 @@ export default {
     videoHeight: function(){
       return Math.floor(this.height/2)
     },
-    roomId() {
-      return this.$route.query.roomId
+    userId() {
+      return this.$route.query.userId
     },
-    playerId() {
-      return this.$route.params.id
+    displayUserId() {
+      return this.$route.query.displayUserId
     },
-    fireRoom: function(){
-      return db.collection('rooms').doc(this.roomId)
+    isMe() {
+      return this.userId === this.displayUserId
     },
   },
   methods: {
@@ -95,49 +87,45 @@ export default {
       this.indices.splice(arrayIdx, 1) // 既出単語を削除
     },
     initialize() {
-      this.fireRoom.update({appState: {
-        questioner: null,
-        nAnswer: 0,
-        time: 60
-      }})
+      const appState = this.room.appState || {}
+      appState['questioner'] = this.userId
+      appState['nAnswer'] = 0
+      appState['time'] = 60
+      window.parent.postMessage({appState}, process.env.whimUrl)
     },
     start() {
-      this.fireRoom.update({appState: {
-        questioner: this.playerId,
-        nAnswer: 0,
-        time: 60
-      }})
+      const appState = this.room.appState || {}
+      appState['questioner'] = this.userId
+      appState['nAnswer'] = 0
+      appState['time'] = 60
+      window.parent.postMessage({appState}, process.env.whimUrl)
       this.newTheme()
       // return /***** この上の設定がthis.appStateに反映されない */
       const timeKeeper = () => {
         // const state = await this.fireRoom.get()
         // const time = state.data().appState.time
-        const time = this.room.appState.time
         console.log(time)
         if(time === 0) {
           this.finish()
           return
         }
-        this.fireRoom.update({appState: {
-          questioner: this.room.appState.questioner,
-          nAnswer: this.room.appState.nAnswer,
-          time: time-1
-        }})
+        let appState = this.room.appState
+        appState['time']--
+        window.parent.postMessage({appState}, process.env.whimUrl)
         setTimeout(timeKeeper, 1000)
       }
       setTimeout(timeKeeper, 1000)
     },
     correct() {
-      this.fireRoom.update({appState: {
-          questioner: this.room.appState.questioner,
-          nAnswer: this.room.appState.nAnswer + 1,
-          time: this.room.appState.time
-      }})
+      const appState = this.room.appState
+      if(!appState) return
+      appState['nAnswer']++
+      window.parent.postMessage({appState}, process.env.whimUrl)
       this.newTheme()
     },
     finish() {}
   },
-  async mounted() {
+  async mountedd() {
     console.log('roomId:' + this.roomId)
 
     const data = await firebase.auth().signInAnonymously()
@@ -153,6 +141,30 @@ export default {
     this.$bind('room', this.fireRoom)
     this.$bind('appUserState', this.fireRoom.collection('appUserState'))
     this.$bind('users', this.fireRoom.collection('users'))
+    this.loading = false
+  },
+  async mounted() {
+    console.log('game successfully started')
+
+    // wh.im本体との通信を開始
+    window.parent.postMessage("connect", process.env.whimUrl);
+
+    // wh.imから room / users情報が送られてきたら登録
+    window.addEventListener('message', (event) => {
+      console.log("get event: " + event)
+      if(event.data.room){
+        console.log("room: " + event.data.room)
+        this.room = event.data.room
+      } else if(event.data.users){
+        console.log("user: " + event.data.users)
+        this.users = event.data.users
+      }
+    }, false);
+    const appState = this.room.appState || {}
+    appState['questioner'] = this.userId
+    appState['nAnswer'] = 0
+    appState['time'] = 0
+    window.parent.postMessage({appState}, process.env.whimUrl)
     this.loading = false
   }
 }
