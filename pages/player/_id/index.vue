@@ -37,11 +37,6 @@
 
 
 <script>
-
-import firebase from "~/plugins/firebase.js"
-// import func from '../../vue-temp/vue-editor-bridge';
-const db = firebase.firestore();
-
 export default {
   name: 'rooms-id',
   data: function () {
