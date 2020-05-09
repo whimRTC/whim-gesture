@@ -108,7 +108,7 @@ jobs:
     - name: Deploy Firebase Hosting
       uses: w9jds/firebase-action@master
       with:
-        args: deploy --only hosting:gesture-janken
+        args: deploy --only hosting:whim-gesture
       env:
         PROJECT_ID: whim-ap
         GCP_SA_KEY: ${{ secrets.GCP_SA_KEY }}
