@@ -11,7 +11,7 @@ on:
 # A workflow run is made up of one or more jobs that can run sequentially or in parallel
 jobs:
   # This workflow contains a single job called "build"
-  build-deploy:
+  deploy-dev:
     # The type of runner that the job will run on
     runs-on: ubuntu-latest
 
@@ -26,52 +26,89 @@ jobs:
       with:
         node-version: '12.x'
 
-    - name: Get yarn cache directory path
-      id: yarn-cache-dir-path
-      run: echo "::set-output name=dir::$(yarn cache dir)"
-
-    - uses: actions/cache@v1
-      id: yarn-cache # use this to check for `cache-hit` (`steps.yarn-cache.outputs.cache-hit != 'true'`)
-      with:
-        path: ${{ steps.yarn-cache-dir-path.outputs.dir }}
-        key: ${{ runner.os }}-yarn-${{ hashFiles('**/yarn.lock') }}
-        restore-keys: |
-          ${{ runner.os }}-yarn-
-          
     - name: install
       run: yarn
       env:
         NODE_ENV: development
-
-    - name: build
-      run: yarn generate
-      env:
-        NUXT_ENV_APP_ENV: production
-        NUXT_ENV_WHIM_ENV: production
-
-    - name: mv
-      run: mv dist public
-
-    - name: build
-      run: yarn generate
-      env:
-        NUXT_ENV_APP_ENV: production
-        NUXT_ENV_WHIM_ENV: staging
-
-    - name: mv
-      run: mv dist public/stg
-
+    
     - name: build
       run: yarn generate
       env:
         NUXT_ENV_APP_ENV: production
         NUXT_ENV_WHIM_ENV: development
 
-    - name: mv
-      run: mv dist public/dev
-
-    - name: deploy
-      uses: peaceiris/actions-gh-pages@v3
+    - name: Deploy Firebase Hosting
+      uses: w9jds/firebase-action@master
       with:
-        github_token: ${{ secrets.GITHUB_TOKEN }}
-        publish_dir: ./public
+        args: deploy --only hosting:whim-gesture-dev
+      env:
+        PROJECT_ID: whim-ap
+        GCP_SA_KEY: ${{ secrets.GCP_SA_KEY }}
+
+  deploy-stg:
+    # The type of runner that the job will run on
+    runs-on: ubuntu-latest
+
+    # Steps represent a sequence of tasks that will be executed as part of the job
+    steps:
+    # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
+    - uses: actions/checkout@v2
+
+    # Runs a single command using the runners shell
+    - name: setup node
+      uses: actions/setup-node@v1
+      with:
+        node-version: '12.x'
+
+    - name: install
+      run: yarn
+      env:
+        NODE_ENV: development
+    
+    - name: build
+      run: yarn generate
+      env:
+        NUXT_ENV_APP_ENV: production
+        NUXT_ENV_WHIM_ENV: staging
+
+    - name: Deploy Firebase Hosting
+      uses: w9jds/firebase-action@master
+      with:
+        args: deploy --only hosting:whim-gesture-stg
+      env:
+        PROJECT_ID: whim-ap
+        GCP_SA_KEY: ${{ secrets.GCP_SA_KEY }}
+
+  deploy-prod:
+    # The type of runner that the job will run on
+    runs-on: ubuntu-latest
+
+    # Steps represent a sequence of tasks that will be executed as part of the job
+    steps:
+    # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
+    - uses: actions/checkout@v2
+
+    # Runs a single command using the runners shell
+    - name: setup node
+      uses: actions/setup-node@v1
+      with:
+        node-version: '12.x'
+
+    - name: install
+      run: yarn
+      env:
+        NODE_ENV: development
+    
+    - name: build
+      run: yarn generate
+      env:
+        NUXT_ENV_APP_ENV: production
+        NUXT_ENV_WHIM_ENV: production
+
+    - name: Deploy Firebase Hosting
+      uses: w9jds/firebase-action@master
+      with:
+        args: deploy --only hosting:gesture-janken
+      env:
+        PROJECT_ID: whim-ap
+        GCP_SA_KEY: ${{ secrets.GCP_SA_KEY }}
