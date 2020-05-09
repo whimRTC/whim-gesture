@@ -90,20 +90,6 @@ export default {
   server: {
     host: '0.0.0.0' // デフォルト: localhost
   },
-  router: {
-    base: (function() {
-      if(process.env.NUXT_ENV_APP_ENV === 'development'){
-        return '/'
-      }
-      if(process.env.NUXT_ENV_WHIM_ENV === 'development'){
-        return '/whim-gesture/dev/'
-      }else if(process.env.NUXT_ENV_WHIM_ENV === 'staging'){
-        return '/whim-gesture/stg/'
-      }else{
-        return '/whim-gesture/'
-      }
-    }())
-  },
   generate: {
     routes: [
       'player/1',
@@ -114,6 +100,14 @@ export default {
   },
   env: {
     appEnv: process.env.NUXT_ENV_APP_ENV,
-    whimEnv: process.env.NUXT_ENV_WHIM_ENV
+    whimUrl: (function () {
+      if(process.env.NUXT_ENV_WHIM_ENV == "development"){
+        return "http://localhost:3000"
+      }else if(process.env.NUXT_ENV_WHIM_ENV == "staging"){
+        return "https://stg.wh.im"
+      }else{
+        return "https://wh.im"
+      }
+    }()),
   }
 }
