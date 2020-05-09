@@ -90,14 +90,6 @@ export default {
   server: {
     host: '0.0.0.0' // デフォルト: localhost
   },
-  generate: {
-    routes: [
-      'player/1',
-      'player/2',
-      'player/3',
-      'player/4'
-    ]
-  },
   env: {
     appEnv: process.env.NUXT_ENV_APP_ENV,
     whimUrl: (function () {
