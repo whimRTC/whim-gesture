@@ -7,7 +7,7 @@
       class="player"
       :width="videoWidth" 
       :height="videoHeight" 
-      v-else-if="isMe && userId === room.appState.questioner && room.appState.time!==0"
+      v-else-if="isMe && userId === appState.questioner && appState.time!==0"
     >
       <div>
         <v-card>
@@ -15,20 +15,20 @@
             {{theme}}
           </v-card-title>
           <v-card-subtitle>
-            正解数: {{room.appState.nAnswer}}
-            あと{{room.appState.time}}秒！
+            正解数: {{appState.nAnswer}}
+            あと{{appState.time}}秒！
           </v-card-subtitle>
           <v-btn color="danger" @click="newTheme">パス</v-btn>
           <v-btn color="success" @click="correct">OK</v-btn>
         </v-card>
       </div>
     </div>
-    <v-btn v-else-if="$route.query.isMe === 'True' && !room.appState.questioner" @click="start">出題者になる</v-btn>
-    <v-card v-else-if="isMe && room.appState.time===0" @click="initialize">
-      <v-card-text>結果: {{room.appState.nAnswer}}ポイント</v-card-text>
+    <v-btn v-else-if="isMe && !appState.questioner" @click="start">出題者になる</v-btn>
+    <v-card v-else-if="isMe && appState.time===0" @click="initialize">
+      <v-card-text>結果: {{appState.nAnswer}}ポイント</v-card-text>
       <v-btn @click="initialize">もう一度やる！</v-btn>
     </v-card>
-    <div v-else-if="userId === room.appState.questioner && room.appState.time!==0">
+    <div v-else-if="userId === appState.questioner && appState.time!==0">
       <v-btn class="mb-12">ジェスチャー中</v-btn>
       <span/>
     </div>
@@ -50,7 +50,6 @@ export default {
       room: {
         appState: {}
       },
-      appState: {},
       indices: [],
       vocabulary: ['ウサギ', 'キツネ', '野球', 'サッカー', 'バスケットボール', '料理', '先生', 'ふりかけ', '恐竜', 'テニス', 'ラグビー', '柔道', '剣道', '空手', '水泳', 'スケート', '棒高跳び', '砲丸投げ', '編み物', '茶道', '乳搾り', 'パソコン', 'テレビゲーム', '掃除', '漫才', '宇宙飛行士', '運転', '飛行機', 'オートバイ']
     }
@@ -71,6 +70,13 @@ export default {
     isMe() {
       return this.userId === this.displayUserId
     },
+    appState() {
+      return this.room.appState || {}
+    },
+    // この画面のプレイヤーを返す
+    user() {
+      return this.users.find(user => user.id == this.userId);
+    }
   },
   methods: {
     newTheme() {
@@ -99,8 +105,8 @@ export default {
       const timeKeeper = () => {
         // const state = await this.fireRoom.get()
         // const time = state.data().appState.time
-        console.log(time)
-        if(time === 0) {
+        console.log(this.appState.time)
+        if(this.appState.time === 0) {
           this.finish()
           return
         }
@@ -120,24 +126,6 @@ export default {
     },
     finish() {}
   },
-  async mountedd() {
-    console.log('roomId:' + this.roomId)
-
-    const data = await firebase.auth().signInAnonymously()
-
-    this.uid = data.user.uid
-
-    await this.fireRoom.collection('appClients').doc(this.uid).set({});
-    await this.fireRoom.update({appState: {
-      questioner: null,
-      nAnswer: 0,
-      time: 60
-    }})
-    this.$bind('room', this.fireRoom)
-    this.$bind('appUserState', this.fireRoom.collection('appUserState'))
-    this.$bind('users', this.fireRoom.collection('users'))
-    this.loading = false
-  },
   async mounted() {
     console.log('game successfully started')
 
@@ -156,7 +144,7 @@ export default {
       }
     }, false);
     const appState = this.room.appState || {}
-    appState['questioner'] = this.userId
+    appState['questioner'] = null
     appState['nAnswer'] = 0
     appState['time'] = 0
     window.parent.postMessage({appState}, process.env.whimUrl)
