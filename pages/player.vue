@@ -7,7 +7,7 @@
       class="player"
       :width="videoWidth" 
       :height="videoHeight" 
-      v-else-if="isMe && displayId === appState.questioner && appState.time!==0"
+      v-else-if="isMe && userId === appState.questioner && timeLeft && timeLeft>0"
     >
       <div>
         <v-card>
@@ -24,11 +24,11 @@
       </div>
     </div>
     <v-btn v-else-if="isMe && !appState.questioner" @click="start">出題者になる</v-btn>
-    <v-card v-else-if="isMe && appState.time===0" @click="initialize">
+    <v-card v-else-if="isMe && (!timeLeft || timeLeft <= 0)" @click="initialize">
       <v-card-text>結果: {{appState.nAnswer}}ポイント</v-card-text>
       <v-btn @click="initialize">もう一度やる！</v-btn>
     </v-card>
-    <div v-else-if="userId === appState.questioner && appState.time!==0">
+    <div v-else-if="displayUserId === appState.questioner && timeLeft && timeLeft > 0">
       <v-btn class="mb-12">ジェスチャー中</v-btn>
       <span/>
     </div>
@@ -37,6 +37,8 @@
 
 
 <script>
+const TIME_LIMIT = 60
+
 export default {
   name: 'rooms-id',
   data: function () {
@@ -50,6 +52,7 @@ export default {
       room: {
         appState: {}
       },
+      now: new Date().getTime(),
       indices: [],
       vocabulary: ['ウサギ', 'キツネ', '野球', 'サッカー', 'バスケットボール', '料理', '先生', 'ふりかけ', '恐竜', 'テニス', 'ラグビー', '柔道', '剣道', '空手', '水泳', 'スケート', '棒高跳び', '砲丸投げ', '編み物', '茶道', '乳搾り', 'パソコン', 'テレビゲーム', '掃除', '漫才', '宇宙飛行士', '運転', '飛行機', 'オートバイ']
     }
@@ -76,7 +79,19 @@ export default {
     // この画面のプレイヤーを返す
     user() {
       return this.users.find(user => user.id == this.userId);
-    }
+    },
+    timeLeft() {
+      const timeBegin = this.appState.timeBegin
+      if(timeBegin === undefined) return undefined
+      const between = this.now - timeBegin
+      const t = TIME_LIMIT - Math.floor(between / 1000)
+      if(t <= 0) {
+        const appState = this.appState
+        appState['finished'] = true
+        window.parent.postMessage({appState}, process.env.whimUrl)
+      }
+      return t
+    },
   },
   methods: {
     newTheme() {
@@ -98,24 +113,10 @@ export default {
       const appState = this.room.appState || {}
       appState['questioner'] = this.userId
       appState['nAnswer'] = 0
-      appState['time'] = 60
+      appState['timeBegin'] = new Date().getTime()
       window.parent.postMessage({appState}, process.env.whimUrl)
       this.newTheme()
       // return /***** この上の設定がthis.appStateに反映されない */
-      const timeKeeper = () => {
-        // const state = await this.fireRoom.get()
-        // const time = state.data().appState.time
-        console.log(this.appState.time)
-        if(this.appState.time === 0) {
-          this.finish()
-          return
-        }
-        let appState = this.room.appState
-        appState['time']--
-        window.parent.postMessage({appState}, process.env.whimUrl)
-        setTimeout(timeKeeper, 1000)
-      }
-      setTimeout(timeKeeper, 1000)
     },
     correct() {
       const appState = this.room.appState
@@ -128,6 +129,9 @@ export default {
   },
   async mounted() {
     console.log('game successfully started')
+    setInterval(() => {
+      this.now = new Date().getTime()
+    }, 100)
 
     // wh.im本体との通信を開始
     window.parent.postMessage("connect", process.env.whimUrl);
