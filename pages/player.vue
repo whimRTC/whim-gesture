@@ -7,7 +7,7 @@
       class="player"
       :width="videoWidth" 
       :height="videoHeight" 
-      v-else-if="isMe && userId === appState.questioner && timeLeft && timeLeft>0"
+      v-else-if="isMe && userId === appState.questioner && appState.phase === 'playing'"
     >
       <div>
         <v-card>
@@ -23,12 +23,12 @@
         </v-card>
       </div>
     </div>
-    <v-btn v-else-if="isMe && !appState.questioner" @click="start">出題者になる</v-btn>
-    <v-card v-else-if="isMe && (!timeLeft || timeLeft <= 0)" @click="initialize">
+    <v-btn v-else-if="isMe && appState.phase === 'notStarted'" @click="start">出題者になる</v-btn>
+    <v-card v-else-if="isMe && appState.phase === 'finished'" @click="initialize">
       <v-card-text>結果: {{appState.nAnswer}}ポイント</v-card-text>
       <v-btn @click="initialize">もう一度やる！</v-btn>
     </v-card>
-    <div v-else-if="displayUserId === appState.questioner && timeLeft && timeLeft > 0">
+    <div v-else-if="displayUserId === appState.questioner && appState.phase === 'playing'">
       <v-btn class="mb-12">ジェスチャー中</v-btn>
       <span/>
     </div>
@@ -81,13 +81,14 @@ export default {
       return this.users.find(user => user.id == this.userId);
     },
     timeLeft() {
+      if(this.appState.phase !== 'playing') return undefined
       const timeBegin = this.appState.timeBegin
       if(timeBegin === undefined) return undefined
       const between = this.now - timeBegin
       const t = TIME_LIMIT - Math.floor(between / 1000)
       if(t <= 0) {
         const appState = this.appState
-        appState['finished'] = true
+        appState['phase'] = 'finished'
         window.parent.postMessage({appState}, process.env.whimUrl)
       }
       return t
@@ -106,7 +107,7 @@ export default {
       const appState = this.room.appState || {}
       appState['questioner'] = this.userId
       appState['nAnswer'] = 0
-      appState['timeBegin'] = 0
+      appState['phase'] = 'notStarted'
       window.parent.postMessage({appState}, process.env.whimUrl)
     },
     start() {
@@ -114,6 +115,7 @@ export default {
       appState['questioner'] = this.userId
       appState['nAnswer'] = 0
       appState['timeBegin'] = new Date().getTime()
+      appState['phase'] = 'playing'
       window.parent.postMessage({appState}, process.env.whimUrl)
       this.newTheme()
       // return /***** この上の設定がthis.appStateに反映されない */
@@ -148,6 +150,7 @@ export default {
       }
     }, false);
     const appState = this.room.appState || {}
+    appState['phase'] = 'notStarted'
     appState['questioner'] = null
     appState['nAnswer'] = 0
     appState['time'] = 0
