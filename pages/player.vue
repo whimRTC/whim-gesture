@@ -16,7 +16,7 @@
           </v-card-title>
           <v-card-subtitle>
             正解数: {{appState.nAnswer}}
-            あと{{appState.time}}秒！
+            あと{{timeLeft}}秒！
           </v-card-subtitle>
           <v-btn color="danger" @click="newTheme">パス</v-btn>
           <v-btn color="success" @click="correct">OK</v-btn>
@@ -106,7 +106,7 @@ export default {
       const appState = this.room.appState || {}
       appState['questioner'] = this.userId
       appState['nAnswer'] = 0
-      appState['time'] = 60
+      appState['timeBegin'] = 0
       window.parent.postMessage({appState}, process.env.whimUrl)
     },
     start() {
