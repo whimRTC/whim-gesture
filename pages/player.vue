@@ -7,7 +7,7 @@
       class="player"
       :width="videoWidth" 
       :height="videoHeight" 
-      v-else-if="isMe && userId === appState.questioner && appState.time!==0"
+      v-else-if="isMe && displayId === appState.questioner && appState.time!==0"
     >
       <div>
         <v-card>
