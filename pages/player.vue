@@ -24,7 +24,7 @@
       </div>
     </div>
     <v-btn v-else-if="isMe && appState.phase === 'notStarted'" @click="start">出題者になる</v-btn>
-    <v-card v-else-if="isMe && appState.phase === 'finished'" @click="initialize">
+    <v-card v-else-if="isMe && appState.phase === 'finished'">
       <v-card-text>結果: {{appState.nAnswer}}ポイント</v-card-text>
       <v-btn @click="initialize">もう一度やる！</v-btn>
     </v-card>
@@ -104,14 +104,13 @@ export default {
       this.indices.splice(arrayIdx, 1) // 既出単語を削除
     },
     initialize() {
-      const appState = this.room.appState || {}
-      appState['questioner'] = this.userId
+      const appState = this.appState
       appState['nAnswer'] = 0
       appState['phase'] = 'notStarted'
       window.parent.postMessage({appState}, process.env.whimUrl)
     },
     start() {
-      const appState = this.room.appState || {}
+      const appState = this.appState
       appState['questioner'] = this.userId
       appState['nAnswer'] = 0
       appState['timeBegin'] = new Date().getTime()
