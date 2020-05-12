@@ -29,7 +29,7 @@
       <v-btn @click="initialize">もう一度やる！</v-btn>
     </v-card>
     <div v-else-if="displayUserId === appState.questioner && appState.phase === 'playing'">
-      <v-btn class="mb-12">ジェスチャー中</v-btn>
+      <v-btn class="mb-12">ジェスチャーちゅう</v-btn>
       <span/>
     </div>
   </div>
