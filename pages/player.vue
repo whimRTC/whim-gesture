@@ -26,7 +26,7 @@
     <v-btn v-else-if="isMe && appState.phase === 'notStarted'" @click="start">出題者になる</v-btn>
     <v-card v-else-if="isMe && appState.phase === 'finished'">
       <v-card-text>結果: {{appState.nAnswer}}ポイント</v-card-text>
-      <v-btn @click="initialize">もう一度やる！</v-btn>
+      <v-btn @click="initialize">もう一度やる!！</v-btn>
     </v-card>
     <div v-else-if="displayUserId === appState.questioner && appState.phase === 'playing'">
       <v-btn class="mb-12">ジェスチャーちゅう</v-btn>
