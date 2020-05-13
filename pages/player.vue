@@ -3,6 +3,7 @@
     <v-btn v-if="loading">
       Now Loading
     </v-btn>
+    <v-btn v-else-if="isMe && appState.phase === 'notStarted'" @click="start">出題者になる</v-btn>
     <div
       class="player"
       :width="videoWidth" 
@@ -23,7 +24,6 @@
         </v-card>
       </div>
     </div>
-    <v-btn v-else-if="isMe && appState.phase === 'notStarted'" @click="start">出題者になる</v-btn>
     <v-card v-else-if="isMe && appState.phase === 'finished'">
       <v-card-text>結果: {{appState.nAnswer}}ポイント</v-card-text>
       <v-btn @click="initialize">もう一度やる！</v-btn>
