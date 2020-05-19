@@ -1,6 +1,6 @@
 <template>
   <div id="app">
-    <Main class="main" />
+    <Main class="main" v-if="!appState.phase" />
 
     <Player
       v-for="user in $store.state.users"
@@ -18,6 +18,11 @@ export default {
   components: {
     Main: () => import("@/components/main/Index"),
     Player: () => import("@/components/player/Index")
+  },
+  computed: {
+    appState() {
+      return this.$store.state.appState;
+    }
   }
 };
 </script>
@@ -29,7 +34,7 @@ export default {
   left: 50%;
   transform: translate(-50%, -50%);
   width: 30%;
-  height: 30%;
+  height: 20%;
   text-align: center;
   background: rgba(256, 256, 256, 0.7);
   z-index: 1;
