@@ -14,12 +14,14 @@
       <div class="answer">
         正解数: {{ appState.nAnswer }} あと{{ timeLeft }}秒！
       </div>
-      <button color="danger" @click="newTheme">パス</button>
-      <button color="success" @click="correct">OK</button>
+      <button class="btn-flat-border red" @click="newTheme">パス</button>
+      <button class="btn-flat-border blue" @click="correct">OK</button>
     </div>
     <div v-else-if="isMe && appState.phase === 'finished'" class="player">
       <div class="answer">結果: {{ appState.nAnswer }}ポイント</div>
-      <button @click="initialize">もう一度やる!！</button>
+      <button class="btn-flat-border blue" @click="initialize">
+        もう一度やる!！
+      </button>
     </div>
     <div
       v-else-if="
@@ -165,13 +167,49 @@ export default {
     0 5px 6px -2px rgba(0, 0, 0, 0.2);
 }
 
+.btn-flat-border {
+  display: inline-block;
+  padding: 0.3em 1em;
+  margin: 0px 5px;
+  text-decoration: none;
+  height: 26px;
+
+  border-radius: 3px;
+  transition: 0.4s;
+
+  &.blue {
+    color: #67c5ff;
+    border: solid 2px #67c5ff;
+    &:hover {
+      background: #67c5ff;
+      color: white;
+    }
+  }
+  &.red {
+    color: #ff67a6;
+    border: solid 2px #ff67a6;
+    &:hover {
+      background: #ff67a6;
+      color: white;
+    }
+  }
+}
+
+.theme {
+  font: 20px;
+}
+
+.answer {
+  margin: 10px;
+}
+
 .player {
   position: absolute;
   top: 50%;
   left: 50%;
   transform: translate(-50%, -50%);
-  width: 30%;
-  height: 20%;
+  width: 200px;
+  height: 100px;
   text-align: center;
   background: rgba(256, 256, 256, 0.7);
   border-radius: 10px;
