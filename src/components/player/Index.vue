@@ -15,7 +15,7 @@
         正解数: {{ appState.nAnswer }} あと{{ timeLeft }}秒！
       </div>
       <button class="btn-flat-border red" @click="newTheme">パス</button>
-      <button class="btn-flat-border blue" @click="correct">OK</button>
+      <button class="btn-flat-border blue" @click="correct">正解</button>
     </div>
     <div v-else-if="isMe && appState.phase === 'finished'" class="player">
       <div class="answer">結果: {{ appState.nAnswer }}ポイント</div>
