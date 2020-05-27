@@ -27,10 +27,9 @@
       v-else-if="
         displayUser.id === appState.questioner && appState.phase === 'playing'
       "
-      class="player"
+      class="gesture"
     >
-      <div class="mb-12">ジェスチャーちゅう</div>
-      <span />
+      ジェスチャーちゅう
     </div>
     <a
       v-else-if="isMe && !appState.phase"
@@ -211,6 +210,18 @@ export default {
   width: 200px;
   height: 100px;
   text-align: center;
+  background: rgba(256, 256, 256, 0.7);
+  border-radius: 10px;
+}
+.gesture {
+  position: absolute;
+  top: 10%;
+  left: 50%;
+  transform: translate(-50%, -10%);
+  width: 200px;
+  height: 20px;
+  text-align: center;
+  font-size: 100%;
   background: rgba(256, 256, 256, 0.7);
   border-radius: 10px;
 }
