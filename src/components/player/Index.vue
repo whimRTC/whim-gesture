@@ -1,10 +1,10 @@
 <template>
-  <div class="container">
+  <div class="container" :class="{ border: isQuestioner }">
     <div
       class="player"
       v-if="
         isMe &&
-          $store.state.accessUserId === appState.questioner &&
+          $whim.accessUser.id === appState.questioner &&
           appState.phase === 'playing'
       "
     >
@@ -40,6 +40,7 @@
   </div>
 </template>
 <script>
+import THEMES from "@/themes";
 const TIME_LIMIT = 60;
 
 export default {
@@ -48,46 +49,15 @@ export default {
   data() {
     return {
       now: new Date().getTime(),
-      indices: [],
-      vocabulary: [
-        "ウサギ",
-        "キツネ",
-        "野球",
-        "サッカー",
-        "バスケットボール",
-        "料理",
-        "先生",
-        "ふりかけ",
-        "恐竜",
-        "テニス",
-        "ラグビー",
-        "柔道",
-        "剣道",
-        "空手",
-        "水泳",
-        "スケート",
-        "棒高跳び",
-        "砲丸投げ",
-        "編み物",
-        "茶道",
-        "乳搾り",
-        "パソコン",
-        "テレビゲーム",
-        "掃除",
-        "漫才",
-        "宇宙飛行士",
-        "運転",
-        "飛行機",
-        "オートバイ"
-      ]
+      indices: []
     };
   },
   computed: {
     isMe() {
-      return this.$store.state.accessUserId === this.displayUser.id;
+      return this.$whim.accessUser.id === this.displayUser.id;
     },
     appState() {
-      return this.$store.state.appState;
+      return this.$whim.state;
     },
     timeLeft() {
       console.log("timeLeft");
@@ -97,16 +67,19 @@ export default {
       const between = this.now - timeBegin;
       const t = TIME_LIMIT - Math.floor(between / 1000);
       if (t <= 0) {
-        this.$store.dispatch("appState", { phase: "finished" });
+        this.$whim.assignState({ phase: "finished" });
       }
       return t;
+    },
+    isQuestioner() {
+      return this.displayUser.id === this.$whim.state.questioner;
     }
   },
   methods: {
     start() {
       console.log("started");
-      this.$store.dispatch("appState", {
-        questioner: this.$store.state.accessUserId,
+      this.$whim.assignState({
+        questioner: this.$whim.accessUser.id,
         nAnswer: 0,
         timeBegin: new Date().getTime(),
         phase: "playing"
@@ -114,21 +87,18 @@ export default {
       this.newTheme();
     },
     initialize() {
-      this.$store.dispatch("resetAppState", {});
+      this.$whim.resetState();
     },
     newTheme() {
       if (this.indices.length === 0) {
-        this.indices = Array.from(
-          { length: this.vocabulary.length },
-          (v, k) => k
-        );
+        this.indices = Array.from({ length: THEMES.length }, (v, k) => k);
       }
       const arrayIdx = Math.floor(Math.random() * this.indices.length);
-      this.theme = this.vocabulary[this.indices[arrayIdx]];
+      this.theme = THEMES[this.indices[arrayIdx]];
       this.indices.splice(arrayIdx, 1); // 既出単語を削除
     },
     correct() {
-      this.$store.dispatch("appState", {
+      this.$whim.assignState({
         nAnswer: this.appState["nAnswer"] + 1
       });
       this.newTheme();
@@ -224,5 +194,13 @@ export default {
   font-size: 100%;
   background: rgba(256, 256, 256, 0.7);
   border-radius: 10px;
+}
+.border {
+  // border: solid;
+  box-sizing: border-box;
+  border-radius: 20px;
+  border-width: 10px;
+  // box-shadow: #67c5ff;
+  box-shadow: 0 0 0 10px #67c5ff inset;
 }
 </style>
