@@ -1,5 +1,5 @@
 <template>
-  <div class="container" :class="{ border: isQuestioner }">
+  <div :class="{ border: isQuestioner }">
     <div
       class="player"
       v-if="
@@ -19,7 +19,7 @@
     </div>
     <div v-else-if="isMe && appState.phase === 'finished'" class="player">
       <div class="answer">結果: {{ appState.nAnswer }}ポイント</div>
-      <button class="btn-flat-border blue" @click="initialize">
+      <button class="btn-flat-border blue position-below" @click="initialize">
         もう一度やる!！
       </button>
     </div>
@@ -45,7 +45,9 @@ const TIME_LIMIT = 60;
 
 export default {
   name: "Player",
-  props: ["displayUser"], // 表示されているUserの情報
+  props: {
+    displayUser: Object
+  }, // 表示されているUserの情報
   data() {
     return {
       now: new Date().getTime(),
@@ -114,7 +116,7 @@ export default {
 <style lang="scss" scoped>
 .fuwatto_btn_yellow {
   display: block;
-  background-color: #ffc605;
+  background-color: #67c5ff;
   color: #fff;
   padding: 0.8em;
   text-decoration: none;
@@ -165,7 +167,7 @@ export default {
 }
 
 .theme {
-  font: 20px;
+  font-size: 25px;
 }
 
 .answer {
@@ -174,10 +176,11 @@ export default {
 
 .player {
   position: absolute;
-  top: 50%;
+  top: 10%;
   left: 50%;
-  transform: translate(-50%, -50%);
-  width: 200px;
+  transform: translate(-50%, -10%);
+  width: 25vw;
+  min-width: 180px;
   height: 100px;
   text-align: center;
   background: rgba(256, 256, 256, 0.7);
@@ -202,5 +205,8 @@ export default {
   border-width: 10px;
   // box-shadow: #67c5ff;
   box-shadow: 0 0 0 10px #67c5ff inset;
+}
+.position-below {
+  padding-top: 5px;
 }
 </style>
