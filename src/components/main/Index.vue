@@ -18,9 +18,9 @@ export default {
 <style lang="scss" scoped>
 .container {
   position: absolute;
-  top: 50%;
+  top: 10%;
   left: 50%;
-  transform: translate(-50%, -50%);
+  transform: translate(-50%, -10%);
   width: 30px;
   min-width: 180px;
   height: 100px;
