@@ -74,7 +74,7 @@ export default {
       }
       const arrayIdx = Math.floor(Math.random() * this.indices.length);
       this.theme = THEMES[this.indices[arrayIdx]];
-      this.$forceUpdate(); // なぜ変更が検知されない
+      this.$forceUpdate(); // なぜか変更が検知されない
       this.indices.splice(arrayIdx, 1); // 既出単語を削除
     },
     correct() {
@@ -154,7 +154,7 @@ export default {
   transform: translate(-50%, -10%);
   width: 25vw;
   min-width: 180px;
-  height: 60px;
+  height: 80px;
   text-align: center;
   background: rgba(256, 256, 256, 0.7);
   border-radius: 10px;
