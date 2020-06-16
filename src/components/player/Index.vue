@@ -34,7 +34,7 @@
     <a
       v-else-if="isMe && !appState.phase"
       @click="start"
-      class="fuwatto_btn_yellow"
+      class="fuwatto_btn_start"
       >出題者になる</a
     >
   </div>
@@ -79,7 +79,6 @@ export default {
   },
   methods: {
     start() {
-      console.log("started");
       this.$whim.assignState({
         questioner: this.$whim.accessUser.id,
         nAnswer: 0,
@@ -101,7 +100,7 @@ export default {
     },
     correct() {
       this.$whim.assignState({
-        nAnswer: this.appState["nAnswer"] + 1
+        nAnswer: this.appState.nAnswer + 1
       });
       this.newTheme();
     }
@@ -114,7 +113,7 @@ export default {
 };
 </script>
 <style lang="scss" scoped>
-.fuwatto_btn_yellow {
+.fuwatto_btn_start {
   display: block;
   background-color: #67c5ff;
   color: #fff;
@@ -130,14 +129,13 @@ export default {
   transform: translate(-50%, -50%);
   width: 100px;
   text-align: center; /*一応BOX内の文字も中央寄せ*/
+  &:hover {
+    cursor: pointer;
+    text-decoration: none;
+    box-shadow: 0 5px 10px 0 rgba(0, 0, 0, 0.12),
+      0 3px 20px 0 rgba(0, 0, 0, 0.12), 0 5px 6px -2px rgba(0, 0, 0, 0.2);
+  }
 }
-.fuwatto_btn_yellow:hover {
-  cursor: pointer;
-  text-decoration: none;
-  box-shadow: 0 5px 10px 0 rgba(0, 0, 0, 0.12), 0 3px 20px 0 rgba(0, 0, 0, 0.12),
-    0 5px 6px -2px rgba(0, 0, 0, 0.2);
-}
-
 .btn-flat-border {
   display: inline-block;
   padding: 0.3em 1em;
@@ -207,6 +205,6 @@ export default {
   box-shadow: 0 0 0 10px #67c5ff inset;
 }
 .position-below {
-  padding-top: 5px;
+  margin-top: 20px;
 }
 </style>
