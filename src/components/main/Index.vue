@@ -28,7 +28,7 @@ export default {
   transform: translate(-50%, -10%);
   width: 30px;
   min-width: 180px;
-  height: 100px;
+  height: 70px;
   background: rgba(256, 256, 256, 0.7);
   border-radius: 10px;
 }
