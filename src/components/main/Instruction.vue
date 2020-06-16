@@ -1,6 +1,6 @@
 <template>
   <div class="subtitle">
-    出題者は<br />「出題者になる」<br />を押して<br />スタート！
+    出題者は<br />「出題者になる」<br />を押してスタート！
   </div>
 </template>
 <script>
