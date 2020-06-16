@@ -1,22 +1,27 @@
 <template>
-  <div :class="{ container: !phase }">
-    <div class="subtitle" v-if="!phase">
-      出題者は<br />「出題者になる」<br />を押して<br />スタート！
-    </div>
+  <div
+    :class="{
+      'container-top': !phase,
+      'container-center': phase === 'playing' || phase === 'finished'
+    }"
+  >
+    <Instruction v-if="!phase" />
+    <OnPlaying v-else-if="phase === 'playing' || phase === 'finished'" />
   </div>
 </template>
 <script>
+import Mixins from "@/mixins";
 export default {
   name: "Main",
-  computed: {
-    phase() {
-      return this.$whim.state.phase;
-    }
-  }
+  components: {
+    Instruction: () => import("@/components/main/Instruction"),
+    OnPlaying: () => import("@/components/main/OnPlaying")
+  },
+  mixins: [Mixins]
 };
 </script>
 <style lang="scss" scoped>
-.container {
+.container-top {
   position: absolute;
   top: 10%;
   left: 50%;
@@ -27,12 +32,10 @@ export default {
   background: rgba(256, 256, 256, 0.7);
   border-radius: 10px;
 }
-
-.subtitle {
-  text-align: center;
-  font-weight: 300;
-  font-size: 20px;
-  word-spacing: 5px;
-  padding-bottom: 15px;
+.container-center {
+  position: absolute;
+  top: 100%;
+  left: 50%;
+  transform: translate(-50%, -100%);
 }
 </style>

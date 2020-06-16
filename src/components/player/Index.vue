@@ -11,17 +11,8 @@
       <div class="theme">
         {{ theme }}
       </div>
-      <div class="answer">
-        正解数: {{ appState.nAnswer }} あと{{ timeLeft }}秒！
-      </div>
       <button class="btn-flat-border red" @click="newTheme">パス</button>
       <button class="btn-flat-border blue" @click="correct">正解</button>
-    </div>
-    <div v-else-if="isMe && appState.phase === 'finished'" class="player">
-      <div class="answer">結果: {{ appState.nAnswer }}ポイント</div>
-      <button class="btn-flat-border blue position-below" @click="initialize">
-        もう一度やる!！
-      </button>
     </div>
     <div
       v-else-if="
@@ -41,7 +32,6 @@
 </template>
 <script>
 import THEMES from "@/themes";
-const TIME_LIMIT = 60;
 
 export default {
   name: "Player",
@@ -60,18 +50,6 @@ export default {
     },
     appState() {
       return this.$whim.state;
-    },
-    timeLeft() {
-      console.log("timeLeft");
-      if (this.appState.phase !== "playing") return undefined;
-      const timeBegin = this.appState.timeBegin;
-      if (timeBegin === undefined) return undefined;
-      const between = this.now - timeBegin;
-      const t = TIME_LIMIT - Math.floor(between / 1000);
-      if (t <= 0) {
-        this.$whim.assignState({ phase: "finished" });
-      }
-      return t;
     },
     isQuestioner() {
       return this.displayUser.id === this.$whim.state.questioner;
@@ -168,10 +146,6 @@ export default {
   font-size: 25px;
 }
 
-.answer {
-  margin: 10px;
-}
-
 .player {
   position: absolute;
   top: 10%;
@@ -179,7 +153,7 @@ export default {
   transform: translate(-50%, -10%);
   width: 25vw;
   min-width: 180px;
-  height: 100px;
+  height: 60px;
   text-align: center;
   background: rgba(256, 256, 256, 0.7);
   border-radius: 10px;
