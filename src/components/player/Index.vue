@@ -11,7 +11,7 @@
       <div class="theme">
         {{ theme }}
       </div>
-      <button class="btn-flat-border red" @click="newTheme">パス</button>
+      <button class="btn-flat-border red" @click="pass">パス</button>
       <button class="btn-flat-border blue" @click="correct">正解</button>
     </div>
     <div
@@ -68,6 +68,12 @@ export default {
     initialize() {
       this.$whim.resetState();
     },
+    pass() {
+      this.$whim.assignState({
+        sound: "ng"
+      });
+      this.newTheme();
+    },
     newTheme() {
       if (this.indices.length === 0) {
         this.indices = Array.from({ length: THEMES.length }, (v, k) => k);
@@ -79,6 +85,7 @@ export default {
     },
     correct() {
       this.$whim.assignState({
+        sound: "ok",
         nAnswer: this.appState.nAnswer + 1
       });
       this.newTheme();

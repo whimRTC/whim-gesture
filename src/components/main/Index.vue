@@ -11,13 +11,39 @@
 </template>
 <script>
 import Mixins from "@/mixins";
+import { Howl } from "howler";
+
+const SE = {
+  ok: new Howl({ src: require("@/assets/poka01.mp3") }),
+  ng: new Howl({ src: require("@/assets/coin06.mp3") }),
+  cheer: new Howl({ src: require("@/assets/people-performance-cheer1.mp3") }),
+  chanchan: new Howl({ src: require("@/assets/chan-chan2.mp3") })
+};
+
 export default {
   name: "Main",
   components: {
     Instruction: () => import("@/components/main/Instruction"),
     OnPlaying: () => import("@/components/main/OnPlaying")
   },
-  mixins: [Mixins]
+  computed: {
+    sound() {
+      return this.$whim.state.sound;
+    }
+  },
+  mixins: [Mixins],
+  watch: {
+    sound: function(newSound) {
+      if (newSound) {
+        const s = SE[newSound];
+        s.volume(0.05);
+        s.play();
+        this.$whim.assignState({
+          sound: null
+        });
+      }
+    }
+  }
 };
 </script>
 <style lang="scss" scoped>

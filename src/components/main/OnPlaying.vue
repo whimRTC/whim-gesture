@@ -40,7 +40,10 @@ export default {
   methods: {
     end() {
       if (this.$whim.accessUser.id === this.$whim.state.questioner) {
-        this.$whim.assignState({ phase: "finished" });
+        this.$whim.assignState({
+          phase: "finished",
+          sound: this.$whim.state.nAnswer > 0 ? "cheer" : "chanchan"
+        });
       }
     },
     transform(props) {
