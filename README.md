@@ -1,7 +1,7 @@
-# wh.im app template
+# whim-gesture
 
 ## 概要
-wh.im上でアプリを動かすときのVue.jsによるテンプレートです。
+wh.im上で遊べるジェスチャーゲームです。
 
 ## 使い方
 クローンし、remoteを変更します
